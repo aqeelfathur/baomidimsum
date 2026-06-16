@@ -23,6 +23,21 @@ type ReferralResult = {
   message: string;
 };
 
+type BatchInfo = {
+  id: string;
+  nama: string;
+  tanggal_mulai_form: string;
+  tanggal_selesai_form: string;
+  dikirim_kapan: string;
+};
+
+type BatchStatus = {
+  success: boolean;
+  active: boolean;
+  batch: BatchInfo | null;
+  message: string;
+};
+
 type ToastType = "success" | "error" | "info";
 
 type ToastState = {
@@ -85,6 +100,10 @@ export default function OrderPage() {
   const [inventoryError, setInventoryError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [validatingReferral, setValidatingReferral] = useState(false);
+
+  const [batchStatus, setBatchStatus] = useState<BatchStatus | null>(null);
+  const [loadingBatch, setLoadingBatch] = useState(true);
+  const [batchError, setBatchError] = useState("");
 
   const [nama, setNama] = useState("");
   const [noTelp, setNoTelp] = useState("");
@@ -150,6 +169,7 @@ export default function OrderPage() {
   }, [inventory, quantities]);
 
   useEffect(() => {
+    fetchBatchStatus();
     fetchInventory();
 
     return () => {
@@ -196,6 +216,37 @@ export default function OrderPage() {
     setReferralMessage("");
     setDiskonProduk(0);
     setDiskonOngkir(0);
+  }
+
+  async function fetchBatchStatus() {
+    try {
+      setLoadingBatch(true);
+      setBatchError("");
+
+      const response = await fetch("/api/batch", {
+        cache: "no-store",
+      });
+
+      const result = await response.json();
+
+      if (!result.success) {
+        setBatchError(result.message || "Gagal mengambil status batch.");
+        setBatchStatus(null);
+        return;
+      }
+
+      setBatchStatus({
+        success: Boolean(result.success),
+        active: Boolean(result.active),
+        batch: result.batch || null,
+        message: result.message || "",
+      });
+    } catch {
+      setBatchError("Gagal mengambil status batch.");
+      setBatchStatus(null);
+    } finally {
+      setLoadingBatch(false);
+    }
   }
 
   async function fetchInventory() {
@@ -411,6 +462,24 @@ export default function OrderPage() {
 
     if (submitting) return;
 
+    if (loadingBatch) {
+      showToast(
+        "info",
+        "Mengecek batch",
+        "Tunggu sebentar, sistem sedang mengecek status batch."
+      );
+      return;
+    }
+
+    if (!batchStatus?.active) {
+      showToast(
+        "error",
+        "Batch sedang ditutup",
+        batchStatus?.message || "Order belum bisa dilakukan saat ini."
+      );
+      return;
+    }
+
     if (!nama.trim()) {
       showToast("error", "Data belum lengkap", "Nama wajib diisi.");
       return;
@@ -532,6 +601,7 @@ export default function OrderPage() {
         fileInputRef.current.value = "";
       }
 
+      await fetchBatchStatus();
       await fetchInventory();
     } catch {
       showToast(
@@ -543,6 +613,9 @@ export default function OrderPage() {
       setSubmitting(false);
     }
   }
+
+  const submitDisabled =
+    submitting || loadingInventory || loadingBatch || !batchStatus?.active;
 
   return (
     <main className="min-h-screen bg-[#F8F4EE] px-5 py-8 text-[#2A1810] md:px-10">
@@ -602,7 +675,51 @@ export default function OrderPage() {
                 />
               </div>
 
-              <p className="mt-2 text-sm leading-6 text-[#7A5A49]">
+              <div className="mt-4">
+                {loadingBatch ? (
+                  <>
+                    <h1 className="text-xl font-extrabold text-[#2A1810]">
+                      Mengecek Batch...
+                    </h1>
+                    <p className="mt-2 text-sm leading-6 text-[#7A5A49]">
+                      Sistem sedang mengecek status batch order.
+                    </p>
+                  </>
+                ) : batchError ? (
+                  <>
+                    <h1 className="text-xl font-extrabold text-red-600">
+                      Batch Error
+                    </h1>
+                    <p className="mt-2 text-sm leading-6 text-[#7A5A49]">
+                      {batchError}
+                    </p>
+                  </>
+                ) : batchStatus?.active && batchStatus.batch ? (
+                  <>
+                    <h1 className="text-2xl font-extrabold text-[#2A1810]">
+                      {batchStatus.batch.nama}
+                    </h1>
+                    <p className="mt-2 text-sm leading-6 text-[#7A5A49]">
+                      Pesanan akan dikirim pada tanggal{" "}
+                      <span className="font-bold text-[#C61B16]">
+                        {batchStatus.batch.dikirim_kapan}
+                      </span>
+                      .
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h1 className="text-2xl font-extrabold text-[#2A1810]">
+                      Order belum tersedia
+                    </h1>
+                    <p className="mt-2 text-sm leading-6 text-[#7A5A49]">
+                      {batchStatus?.message || "Batch order sedang ditutup."}
+                    </p>
+                  </>
+                )}
+              </div>
+
+              <p className="mt-4 text-sm leading-6 text-[#7A5A49]">
                 Pilih produk sesuai stok tersedia, lalu selesaikan pembayaran di
                 sebelah kanan.
               </p>
@@ -956,6 +1073,7 @@ export default function OrderPage() {
                       type="button"
                       onClick={() => {
                         setBuktiBayarFile(null);
+
                         if (fileInputRef.current) {
                           fileInputRef.current.value = "";
                         }
@@ -1013,10 +1131,16 @@ export default function OrderPage() {
             <button
               type="submit"
               form="order-form"
-              disabled={submitting || loadingInventory}
+              disabled={submitDisabled}
               className="w-full rounded-2xl bg-[#C61B16] px-5 py-4 font-extrabold text-white transition hover:bg-[#A01512] disabled:opacity-60"
             >
-              {submitting ? "Memproses Order..." : "Submit Order"}
+              {loadingBatch
+                ? "Mengecek Batch..."
+                : !batchStatus?.active
+                ? "Batch Sedang Ditutup"
+                : submitting
+                ? "Memproses Order..."
+                : "Submit Order"}
             </button>
           </div>
         </div>
