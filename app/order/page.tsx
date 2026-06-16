@@ -418,8 +418,8 @@ export default function OrderPage() {
   return (
     <main className="min-h-screen bg-[#F8F4EE] px-5 py-8 text-[#2A1810] md:px-10">
       <div className="mx-auto max-w-6xl">
-        <Link href="/" className="text-sm font-semibold text-[#C61B16]">
-          ← Kembali ke Home
+        <Link href="/" className="inline-flex items-center rounded-2xl border border-[#E8CDBB] bg-white px-4 py-2.5 text-sm font-bold text-[#C61B16] shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-md hover:border-[#C61B16]/40 transform focus:outline-none focus:ring-2 focus:ring-[#C61B16]/20">
+          ← 
         </Link>
 
         <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr]">
@@ -683,70 +683,6 @@ export default function OrderPage() {
                 ) : null}
               </div>
 
-              <div>
-                <label className="mb-2 block text-sm font-semibold">
-                  Bukti Bayar
-                </label>
-
-                <div className="mb-3 flex gap-3">
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="rounded-2xl border-2 border-[#C61B16] bg-white px-6 py-3 font-bold text-[#C61B16] transition hover:bg-[#FFF0E7]"
-                  >
-                    {buktiBayarFile ? "Ubah File" : "Pilih File"}
-                  </button>
-
-                  {buktiBayarFile ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setBuktiBayarFile(null);
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = "";
-                        }
-                      }}
-                      className="rounded-2xl border-2 border-gray-300 bg-white px-6 py-3 font-bold text-gray-600 transition hover:bg-gray-50"
-                    >
-                      Batal
-                    </button>
-                  ) : null}
-                </div>
-
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp,application/pdf"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0] || null;
-                    handlePaymentFileChange(file);
-                  }}
-                  className="hidden"
-                />
-
-                {buktiBayarFile ? (
-                  <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-4">
-                    <p className="text-sm font-semibold text-green-700">
-                      ✓ File terpilih
-                    </p>
-                    <p className="mt-2 break-all text-xs text-green-600">
-                      {buktiBayarFile.name}
-                    </p>
-                    <p className="mt-1 text-xs text-green-600">
-                      Ukuran: {(buktiBayarFile.size / 1024 / 1024).toFixed(2)} MB
-                    </p>
-                  </div>
-                ) : (
-                  <div className="rounded-2xl border-2 border-dashed border-[#E8CDBB] bg-[#FFFBF7] p-4">
-                    <p className="text-sm font-semibold text-[#2A1810]">
-                      Belum ada file dipilih
-                    </p>
-                    <p className="mt-2 text-xs text-[#7A5A49]">
-                      Format: PNG, JPG, WEBP, atau PDF. Maksimal 5MB.
-                    </p>
-                  </div>
-                )}
-              </div>
             </div>
 
             <button
@@ -759,79 +695,159 @@ export default function OrderPage() {
           </form>
 
           <aside className="h-fit rounded-[2rem] bg-white p-5 shadow-xl shadow-[#E7B98A]/30 md:p-7">
-            <p className="mb-2 text-sm font-semibold text-[#C61B16]">
-              RINGKASAN
-            </p>
-            <h2 className="text-2xl font-extrabold">Order Kamu</h2>
+            <div className="space-y-5">
+              <aside className="h-fit rounded-[2rem] bg-white p-5 shadow-xl shadow-[#E7B98A]/30 md:p-7">
+                <p className="mb-2 text-sm font-semibold text-[#C61B16]">
+                  RINGKASAN
+                </p>
+                <h2 className="text-2xl font-extrabold">Order Kamu</h2>
 
-            <div className="mt-5 space-y-3">
-              {selectedItems.length > 0 ? (
-                selectedItems.map((item) => (
-                  <div
-                    key={item.id_inventory}
-                    className="flex justify-between gap-4 text-sm"
-                  >
-                    <div>
-                      <p className="font-semibold">{item.produk}</p>
-                      <p className="mt-1 text-xs text-[#7A5A49]">
-                        {item.qty} x {formatRupiah(item.harga)}
-                      </p>
-                    </div>
+                <div className="mt-5 space-y-3">
+                  {selectedItems.length > 0 ? (
+                    selectedItems.map((item) => (
+                      <div
+                        key={item.id_inventory}
+                        className="flex justify-between gap-4 text-sm"
+                      >
+                        <div>
+                          <p className="font-semibold">{item.produk}</p>
+                          <p className="mt-1 text-xs text-[#7A5A49]">
+                            {item.qty} x {formatRupiah(item.harga)}
+                          </p>
+                        </div>
 
+                        <span className="font-bold">
+                          {formatRupiah(item.subtotal)}
+                        </span>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-[#7A5A49]">
+                      Belum ada produk dipilih.
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-5 border-t border-[#E8CDBB] pt-5">
+                  <div className="flex justify-between text-sm">
+                    <span>Subtotal Produk</span>
                     <span className="font-bold">
-                      {formatRupiah(item.subtotal)}
+                      {formatRupiah(subtotalProduk)}
                     </span>
                   </div>
-                ))
-              ) : (
-                <p className="text-sm text-[#7A5A49]">
-                  Belum ada produk dipilih.
+
+                  <div className="mt-3 flex justify-between text-sm">
+                    <span>Ongkir</span>
+                    <span className="font-bold">{formatRupiah(ongkir)}</span>
+                  </div>
+
+                  <div className="mt-3 flex justify-between text-sm">
+                    <span>Diskon Produk</span>
+                    <span className="font-bold text-green-700">
+                      -{formatRupiah(potonganProduk)}
+                    </span>
+                  </div>
+
+                  <div className="mt-3 flex justify-between text-sm">
+                    <span>Diskon Ongkir</span>
+                    <span className="font-bold text-green-700">
+                      -{formatRupiah(potonganOngkir)}
+                    </span>
+                  </div>
+
+                  <div className="mt-5 rounded-2xl bg-[#FFF0E7] p-4">
+                    <div className="flex justify-between text-lg">
+                      <span className="font-extrabold">Total Bayar</span>
+                      <span className="font-extrabold text-[#C61B16]">
+                        {formatRupiah(totalBayar)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+
+              <section className="h-fit rounded-[2rem] bg-white p-5 shadow-xl shadow-[#E7B98A]/30 md:p-7">
+                <p className="mb-2 text-sm font-semibold text-[#C61B16]">
+                  PEMBAYARAN
                 </p>
-              )}
-            </div>
+                <h2 className="text-2xl font-extrabold">Scan QRIS</h2>
 
-            <div className="mt-5 border-t border-[#E8CDBB] pt-5">
-              <div className="flex justify-between text-sm">
-                <span>Subtotal Produk</span>
-                <span className="font-bold">
-                  {formatRupiah(subtotalProduk)}
-                </span>
-              </div>
+                <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-[#E8CDBB] bg-[#FFFBF7] p-4">
+                  <Image
+                    src="/qris.jpg"
+                    alt="QRIS Baomi Dimsum"
+                    width={640}
+                    height={640}
+                    className="w-full rounded-[1rem]"
+                    style={{ height: "auto" }}
+                  />
+                </div>
 
-              <div className="mt-3 flex justify-between text-sm">
-                <span>Ongkir</span>
-                <span className="font-bold">{formatRupiah(ongkir)}</span>
-              </div>
+                <div className="mt-5">
+                  <label className="mb-2 block text-sm font-semibold">
+                    Upload Bukti Bayar
+                  </label>
 
-              <div className="mt-3 flex justify-between text-sm">
-                <span>Diskon Produk</span>
-                <span className="font-bold text-green-700">
-                  -{formatRupiah(potonganProduk)}
-                </span>
-              </div>
+                  <div className="mb-3 flex flex-col gap-3 sm:flex-row">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="rounded-2xl border-2 border-[#C61B16] bg-white px-6 py-3 font-bold text-[#C61B16] transition hover:bg-[#FFF0E7]"
+                    >
+                      {buktiBayarFile ? "Ubah File" : "Pilih File"}
+                    </button>
 
-              <div className="mt-3 flex justify-between text-sm">
-                <span>Diskon Ongkir</span>
-                <span className="font-bold text-green-700">
-                  -{formatRupiah(potonganOngkir)}
-                </span>
-              </div>
+                    {buktiBayarFile ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setBuktiBayarFile(null);
+                          if (fileInputRef.current) {
+                            fileInputRef.current.value = "";
+                          }
+                        }}
+                        className="rounded-2xl border-2 border-gray-300 bg-white px-6 py-3 font-bold text-gray-600 transition hover:bg-gray-50"
+                      >
+                        Batal
+                      </button>
+                    ) : null}
+                  </div>
 
-              <div className="mt-5 flex justify-between text-lg">
-                <span className="font-extrabold">Total Bayar</span>
-                <span className="font-extrabold text-[#C61B16]">
-                  {formatRupiah(totalBayar)}
-                </span>
-              </div>
-            </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp,application/pdf"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      handlePaymentFileChange(file);
+                    }}
+                    className="hidden"
+                  />
 
-            <div className="mt-6 rounded-3xl bg-[#F8F4EE] p-4 text-sm leading-6 text-[#7A5A49]">
-              <p className="font-bold text-[#2A1810]">Catatan:</p>
-              <p className="mt-1">
-                Total bayar di halaman ini bersifat estimasi. Saat submit,
-                sistem akan cek ulang stok, referral, dan total pembayaran dari
-                server.
-              </p>
+                  {buktiBayarFile ? (
+                    <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-4">
+                      <p className="text-sm font-semibold text-green-700">
+                        ✓ File terpilih
+                      </p>
+                      <p className="mt-2 break-all text-xs text-green-600">
+                        {buktiBayarFile.name}
+                      </p>
+                      <p className="mt-1 text-xs text-green-600">
+                        Ukuran: {(buktiBayarFile.size / 1024 / 1024).toFixed(2)} MB
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="rounded-2xl border-2 border-dashed border-[#E8CDBB] bg-[#FFFBF7] p-4">
+                      <p className="text-sm font-semibold text-[#2A1810]">
+                        Belum ada file dipilih
+                      </p>
+                      <p className="mt-2 text-xs text-[#7A5A49]">
+                        Format: PNG, JPG, WEBP, atau PDF. Maksimal 5MB.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </section>
             </div>
           </aside>
         </div>
