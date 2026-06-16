@@ -41,7 +41,7 @@ export default function HomePage() {
     <main
       className={`${inter.className} min-h-screen overflow-hidden bg-[#FFF7EF] text-[#2A1810]`}
     >
-      <section className="relative min-h-screen px-5 py-6 md:px-10">
+      <section className="relative min-h-screen px-5 py-4 md:px-10">
         <div className="absolute left-[-120px] top-[-120px] h-72 w-72 rounded-full bg-[#F2B36B]/30 blur-3xl" />
         <div className="absolute bottom-[-160px] right-[-120px] h-96 w-96 rounded-full bg-[#c61b16]/20 blur-3xl" />
 
@@ -66,7 +66,7 @@ export default function HomePage() {
           </Link>
         </nav>
 
-        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-88px)] max-w-6xl items-center gap-12 py-14 lg:grid-cols-[1fr_0.95fr]">
+        <div className="relative z-10 mx-auto grid min-h-[calc(100vh-152px)] max-w-6xl items-center gap-12 py-14 lg:grid-cols-[1fr_0.95fr]">
           <div>
             
 
