@@ -41,7 +41,7 @@ export default function HomePage() {
     <main
       className={`${inter.className} min-h-screen overflow-hidden bg-[#FFF7EF] text-[#2A1810]`}
     >
-      <section className="relative min-h-screen px-5 py-1 md:px-10">
+      <section className="relative min-h-screen px-5 py-3 md:px-10">
         <div className="absolute left-[-120px] top-[-120px] h-72 w-72 rounded-full bg-[#F2B36B]/30 blur-3xl" />
         <div className="absolute bottom-[-160px] right-[-120px] h-96 w-96 rounded-full bg-[#c61b16]/20 blur-3xl" />
 
