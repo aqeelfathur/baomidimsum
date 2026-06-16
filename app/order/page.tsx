@@ -28,6 +28,8 @@ const MAX_PAYMENT_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 const PRODUCT_IMAGE_MAP: Record<string, string> = {
   "DIMSUM 6 PCS": "/dimsum6pcs.webp",
+  "DIMSUM 16 PCS": "/dimsum6pcs.webp",
+  "DIMSUM 25 PCS": "/dimsum6pcs.webp",
   "ADDITIONAL CHILI OIL": "/chilioil.webp",
 };
 
@@ -685,13 +687,7 @@ export default function OrderPage() {
 
             </div>
 
-            <button
-              type="submit"
-              disabled={submitting || loadingInventory}
-              className="mt-6 w-full rounded-2xl bg-[#C61B16] px-5 py-4 font-extrabold text-white transition hover:bg-[#A01512] disabled:opacity-60"
-            >
-              {submitting ? "Memproses Order..." : "Submit Order"}
-            </button>
+            
           </form>
 
           <aside className="h-fit rounded-[2rem] bg-white p-5 shadow-xl shadow-[#E7B98A]/30 md:p-7">
@@ -849,6 +845,13 @@ export default function OrderPage() {
                 </div>
               </section>
             </div>
+            <button
+              type="submit"
+              disabled={submitting || loadingInventory}
+              className="mt-6 w-full rounded-2xl bg-[#C61B16] px-5 py-4 font-extrabold text-white transition hover:bg-[#A01512] disabled:opacity-60"
+            >
+              {submitting ? "Memproses Order..." : "Submit Order"}
+            </button>
           </aside>
         </div>
       </div>
