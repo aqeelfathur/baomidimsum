@@ -43,9 +43,9 @@ export default function HomePage() {
     >
       <section className="relative min-h-screen px-5 py-6 md:px-10">
         <div className="absolute left-[-120px] top-[-120px] h-72 w-72 rounded-full bg-[#F2B36B]/30 blur-3xl" />
-        <div className="absolute bottom-[-160px] right-[-120px] h-96 w-96 rounded-full bg-[#D94B1F]/20 blur-3xl" />
+        <div className="absolute bottom-[-160px] right-[-120px] h-96 w-96 rounded-full bg-[#c61b16]/20 blur-3xl" />
 
-        <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between">
+          <nav className="relative z-10 mx-auto flex max-w-6xl items-center justify-between">
           <Link href="/" className="inline-flex items-center">
             <Image
               src="/baomilogo.webp"
@@ -57,10 +57,10 @@ export default function HomePage() {
               style={{ height: "auto" }}
             />
           </Link>
-
+ 
           <Link
             href="/order"
-            className="rounded-full border border-[#D94B1F]/25 bg-white/70 px-5 py-2.5 text-sm font-bold text-[#D94B1F] shadow-sm backdrop-blur transition hover:bg-[#D94B1F] hover:text-white"
+            className="rounded-full border border-[#c61b16]/25 bg-white/70 px-5 py-2.5 text-sm font-bold text-[#c61b16] shadow-sm backdrop-blur transition duration-200 hover:from-[#E65A4A] hover:to-[#C61B16] hover:bg-gradient-to-r hover:text-white transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-[#C61B16]/20"
           >
             Order
           </Link>
@@ -68,11 +68,7 @@ export default function HomePage() {
 
         <div className="relative z-10 mx-auto grid min-h-[calc(100vh-88px)] max-w-6xl items-center gap-12 py-14 lg:grid-cols-[1fr_0.95fr]">
           <div>
-            <p
-              className={`${belleza.className} mb-4 inline-flex rounded-full border border-[#E8CDBB] bg-white/70 px-4 py-2 text-sm tracking-[0.28em] text-[#9A3E13] shadow-sm backdrop-blur`}
-            >
-              OPEN BATCH
-            </p>
+            
 
             <h1
               className={`${cinzel.className} max-w-3xl text-5xl font-extrabold leading-[0.95] tracking-[-0.04em] text-[#2A1810] md:text-7xl lg:text-8xl`}
@@ -98,14 +94,14 @@ export default function HomePage() {
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
                 href="/order"
-                className="inline-flex items-center justify-center rounded-2xl bg-[#D94B1F] px-7 py-4 font-extrabold text-white shadow-lg shadow-[#D94B1F]/20 transition hover:bg-[#B83D17]"
+                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#E14B3C] to-[#C61B16] px-7 py-4 font-extrabold text-white shadow-lg shadow-[#C61B16]/30 transform transition duration-200 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-[#C61B16]/25"
               >
                 Order Sekarang
               </Link>
 
               <a
                 href="#menu"
-                className="inline-flex items-center justify-center rounded-2xl border border-[#E8CDBB] bg-white px-7 py-4 font-bold text-[#2A1810] transition hover:border-[#D94B1F]/40"
+                className="inline-flex items-center justify-center rounded-2xl border border-[#E8CDBB] bg-white px-7 py-4 font-bold text-[#2A1810] transition duration-200 hover:-translate-y-1 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-[#C61B16]/10"
               >
                 Lihat Menu
               </a>
@@ -113,9 +109,9 @@ export default function HomePage() {
           </div>
 
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="absolute left-8 top-8 h-full w-full rounded-[2.5rem] bg-[#D94B1F]/15" />
+            <div className="absolute left-8 top-8 h-full w-full rounded-[2.5rem] bg-[#c61b16]/15" />
 
-            <div className="relative rounded-[2.5rem] border border-[#F0D2BE] bg-white p-5 shadow-2xl shadow-[#D94B1F]/10">
+            <div className="relative rounded-[2.5rem] border border-[#F0D2BE] bg-white p-5 shadow-2xl shadow-[#c61b16]/10">
               <div className="relative overflow-hidden rounded-[2rem] bg-[#FFF0E7]">
                 <Image
                   src="/dimsumkatalog.webp"
@@ -140,7 +136,7 @@ export default function HomePage() {
                   </p>
                 </div>
 
-                <p className="shrink-0 text-xl font-extrabold text-[#D94B1F]">
+                <p className="shrink-0 text-xl font-extrabold text-[#c61b16]">
                   Rp23K
                 </p>
               </div>
@@ -169,7 +165,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
             <p
-              className={`${belleza.className} text-sm tracking-[0.3em] text-[#D94B1F]`}
+              className={`${belleza.className} text-sm tracking-[0.3em] text-[#c61b16]`}
             >
               BAOMI MENU
             </p>
@@ -180,17 +176,14 @@ export default function HomePage() {
               Simple menu, bold flavor.
             </h2>
 
-            <p className="mt-4 text-base leading-7 text-[#7A5A49]">
-              Nggak banyak pilihan, tapi tiap menu dibuat jelas: dimsum mentai
-              sebagai main character, chili oil sebagai sidekick.
-            </p>
+            
           </div>
 
           <div className="mt-10 grid gap-5 md:grid-cols-2">
             {menuItems.map((item) => (
               <div
                 key={item.name}
-                className="group overflow-hidden rounded-[2rem] border border-[#E8CDBB] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#D94B1F]/10"
+                className="group overflow-hidden rounded-[2rem] border border-[#E8CDBB] bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl hover:shadow-[#c61b16]/10"
               >
                 <div className="grid gap-0 sm:grid-cols-[180px_1fr]">
                   <div className="relative min-h-[220px] overflow-hidden bg-[#FFF0E7] sm:min-h-full">
@@ -205,7 +198,7 @@ export default function HomePage() {
 
                   <div className="flex flex-col justify-between p-6">
                     <div>
-                      <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#D94B1F]">
+                      <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#c61b16]">
                         {item.detail}
                       </p>
 
@@ -221,13 +214,13 @@ export default function HomePage() {
                     </div>
 
                     <div className="mt-6 flex items-center justify-between">
-                      <p className="text-2xl font-extrabold text-[#D94B1F]">
+                      <p className="text-2xl font-extrabold text-[#c61b16]">
                         {item.price}
                       </p>
 
                       <Link
                         href="/order"
-                        className="rounded-full bg-[#2A1810] px-5 py-2.5 text-sm font-bold text-white transition hover:bg-[#D94B1F]"
+                        className="rounded-full bg-[#2A1810] px-5 py-2.5 text-sm font-bold text-white transition duration-200 hover:bg-[#C61B16] hover:scale-105 shadow-sm transform focus:outline-none focus:ring-2 focus:ring-[#C61B16]/20"
                       >
                         Pilih
                       </Link>
@@ -253,15 +246,12 @@ export default function HomePage() {
                   Open order per batch.
                 </h2>
 
-                <p className="mt-3 max-w-2xl text-sm leading-7 text-white/70">
-                  Pesanan diproses berdasarkan stok yang tersedia. Kalau batch
-                  sudah penuh, order akan ditutup sampai batch berikutnya.
-                </p>
+                
               </div>
 
               <Link
                 href="/order"
-                className="inline-flex items-center justify-center rounded-2xl bg-[#D94B1F] px-7 py-4 font-extrabold text-white transition hover:bg-[#F2B36B] hover:text-[#2A1810]"
+                className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-br from-[#E14B3C] to-[#C61B16] px-7 py-4 font-bold text-white shadow-lg shadow-[#C61B16]/30 transform transition duration-200 hover:scale-105 hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-[#C61B16]/25"
               >
                 Masuk Form Order
               </Link>
