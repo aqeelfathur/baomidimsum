@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type InventoryItem = {
   id_inventory: string;
@@ -62,7 +63,7 @@ function formatRupiah(value: number) {
     style: "currency",
     currency: "IDR",
     maximumFractionDigits: 0,
-  }).format(value);
+  }).format(value || 0);
 }
 
 function fileToBase64(file: File): Promise<string> {
@@ -90,6 +91,8 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 export default function OrderPage() {
+  const router = useRouter();
+
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -99,6 +102,7 @@ export default function OrderPage() {
   const [loadingInventory, setLoadingInventory] = useState(true);
   const [inventoryError, setInventoryError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const [validatingReferral, setValidatingReferral] = useState(false);
 
   const [batchStatus, setBatchStatus] = useState<BatchStatus | null>(null);
@@ -298,6 +302,8 @@ export default function OrderPage() {
   }
 
   function updateQuantity(item: InventoryItem, type: "plus" | "minus") {
+    setSubmitError("");
+
     setQuantities((prev) => {
       const currentQty = prev[item.id_inventory] || 0;
 
@@ -331,6 +337,7 @@ export default function OrderPage() {
 
     if (!code) {
       resetReferralState();
+
       return {
         success: true,
         valid: false,
@@ -368,6 +375,8 @@ export default function OrderPage() {
       setDiskonOngkir(normalizedResult.diskon_ongkir);
 
       if (normalizedResult.valid) {
+        setSubmitError("");
+
         showToast(
           "success",
           "Referral aktif",
@@ -404,6 +413,8 @@ export default function OrderPage() {
   }
 
   function handlePaymentFileChange(file: File | null) {
+    setSubmitError("");
+
     if (!file) {
       setBuktiBayarFile(null);
       return;
@@ -462,6 +473,8 @@ export default function OrderPage() {
 
     if (submitting) return;
 
+    setSubmitError("");
+
     if (loadingBatch) {
       showToast(
         "info",
@@ -472,11 +485,11 @@ export default function OrderPage() {
     }
 
     if (!batchStatus?.active) {
-      showToast(
-        "error",
-        "Batch sedang ditutup",
-        batchStatus?.message || "Order belum bisa dilakukan saat ini."
-      );
+      const message =
+        batchStatus?.message || "Order belum bisa dilakukan saat ini.";
+
+      setSubmitError(message);
+      showToast("error", "Batch sedang ditutup", message);
       return;
     }
 
@@ -517,16 +530,26 @@ export default function OrderPage() {
       return;
     }
 
-    if (referralCode.trim() && !referralChecked) {
-      const result = await validateReferral({ silent: true });
+    if (referralCode.trim()) {
+      if (!referralChecked) {
+        const result = await validateReferral({ silent: true });
 
-      if (!result?.valid) {
-        showToast(
-          "error",
-          "Referral tidak valid",
-          result?.message ||
-            "Hapus kode referral atau gunakan kode lain yang masih aktif."
-        );
+        if (!result?.valid) {
+          const message =
+            result?.message ||
+            "Hapus kode referral atau gunakan kode lain yang masih aktif.";
+
+          setSubmitError(message);
+          showToast("error", "Referral tidak valid", message);
+          return;
+        }
+      } else if (!referralValid) {
+        const message =
+          referralMessage ||
+          "Hapus kode referral atau gunakan kode lain yang masih aktif.";
+
+        setSubmitError(message);
+        showToast("error", "Referral tidak valid", message);
         return;
       }
     }
@@ -570,45 +593,50 @@ export default function OrderPage() {
 
       const result = await response.json();
 
-      if (!result.success) {
-        showToast(
-          "error",
-          "Order gagal",
-          result.message || "Order gagal dibuat. Coba lagi."
-        );
+      if (!response.ok || !result.success) {
+        const message =
+          result.message || "Order gagal dibuat. Silakan coba lagi.";
+
+        setSubmitError(message);
+
+        showToast("error", "Order gagal", message);
 
         await fetchInventory();
         return;
       }
 
-      showToast(
-        "success",
-        "Order berhasil dibuat",
-        `ID Order: ${result.order_id} · Total Bayar: ${formatRupiah(
-          result.total_bayar
-        )}`
+      sessionStorage.setItem(
+        "baomi_last_order",
+        JSON.stringify({
+          orderId: result.order_id || result.id || "-",
+          nama: nama.trim(),
+          noTelp: noTelp.trim(),
+          totalBayar: Number(result.total_bayar) || totalBayar,
+          tipeDelivery,
+          alamatDelivery:
+            tipeDelivery === "delivery" ? alamatDelivery.trim() : "-",
+          referralCode: referralCode.trim().toUpperCase(),
+          batchName: batchStatus.batch?.nama || "",
+          dikirimKapan: batchStatus.batch?.dikirim_kapan || "",
+          items: selectedItems.map((item) => ({
+            produk: item.produk,
+            qty: item.qty,
+            harga: item.harga,
+            subtotal: item.subtotal,
+          })),
+        })
       );
 
-      setNama("");
-      setNoTelp("");
-      setTipeDelivery("ambil_kampus_b");
-      setAlamatDelivery("");
-      setReferralCode("");
-      resetReferralState();
-      setBuktiBayarFile(null);
+      router.push("/order/success");
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "Order gagal dibuat. Coba lagi sebentar.";
 
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      setSubmitError(message);
 
-      await fetchBatchStatus();
-      await fetchInventory();
-    } catch {
-      showToast(
-        "error",
-        "Order gagal",
-        "Order gagal dibuat. Coba lagi sebentar."
-      );
+      showToast("error", "Order gagal", message);
     } finally {
       setSubmitting(false);
     }
@@ -663,7 +691,7 @@ export default function OrderPage() {
             className="rounded-[2rem] bg-white p-5 shadow-xl shadow-[#E7B98A]/30 md:p-7"
           >
             <div>
-              <div className="mb-2">
+              <div className="mb-2 flex justify-center md:justify-start">
                 <Image
                   src="/baomilogo.webp"
                   alt="Baomi Dimsum"
@@ -723,6 +751,16 @@ export default function OrderPage() {
                 Pilih produk sesuai stok tersedia, lalu selesaikan pembayaran di
                 sebelah kanan.
               </p>
+
+              {submitError ? (
+                <div
+                  aria-live="polite"
+                  className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+                >
+                  <p className="font-extrabold">Order belum terkirim</p>
+                  <p className="mt-1 leading-6">{submitError}</p>
+                </div>
+              ) : null}
             </div>
 
             <div className="mt-6 space-y-5">
@@ -730,7 +768,10 @@ export default function OrderPage() {
                 <label className="mb-2 block text-sm font-semibold">Nama</label>
                 <input
                   value={nama}
-                  onChange={(e) => setNama(e.target.value)}
+                  onChange={(e) => {
+                    setNama(e.target.value);
+                    setSubmitError("");
+                  }}
                   placeholder="Nama kamu"
                   className="w-full rounded-2xl border border-[#E8CDBB] px-4 py-3 outline-none transition focus:border-[#C61B16]"
                 />
@@ -742,7 +783,10 @@ export default function OrderPage() {
                 </label>
                 <input
                   value={noTelp}
-                  onChange={(e) => setNoTelp(e.target.value)}
+                  onChange={(e) => {
+                    setNoTelp(e.target.value);
+                    setSubmitError("");
+                  }}
                   placeholder="08xxxxxxxxxx"
                   className="w-full rounded-2xl border border-[#E8CDBB] px-4 py-3 outline-none transition focus:border-[#C61B16]"
                 />
@@ -756,7 +800,10 @@ export default function OrderPage() {
                 <div className="grid gap-3 sm:grid-cols-3">
                   <button
                     type="button"
-                    onClick={() => setTipeDelivery("ambil_kampus_b")}
+                    onClick={() => {
+                      setTipeDelivery("ambil_kampus_b");
+                      setSubmitError("");
+                    }}
                     className={`rounded-2xl border px-4 py-3 text-left transition ${
                       tipeDelivery === "ambil_kampus_b"
                         ? "border-[#C61B16] bg-[#FFF0E7]"
@@ -771,7 +818,10 @@ export default function OrderPage() {
 
                   <button
                     type="button"
-                    onClick={() => setTipeDelivery("ambil_kampus_c")}
+                    onClick={() => {
+                      setTipeDelivery("ambil_kampus_c");
+                      setSubmitError("");
+                    }}
                     className={`rounded-2xl border px-4 py-3 text-left transition ${
                       tipeDelivery === "ambil_kampus_c"
                         ? "border-[#C61B16] bg-[#FFF0E7]"
@@ -786,7 +836,10 @@ export default function OrderPage() {
 
                   <button
                     type="button"
-                    onClick={() => setTipeDelivery("delivery")}
+                    onClick={() => {
+                      setTipeDelivery("delivery");
+                      setSubmitError("");
+                    }}
                     className={`rounded-2xl border px-4 py-3 text-left transition ${
                       tipeDelivery === "delivery"
                         ? "border-[#C61B16] bg-[#FFF0E7]"
@@ -808,7 +861,10 @@ export default function OrderPage() {
                   </label>
                   <textarea
                     value={alamatDelivery}
-                    onChange={(e) => setAlamatDelivery(e.target.value)}
+                    onChange={(e) => {
+                      setAlamatDelivery(e.target.value);
+                      setSubmitError("");
+                    }}
                     placeholder="Isi alamat lengkap"
                     rows={3}
                     className="w-full resize-none rounded-2xl border border-[#E8CDBB] px-4 py-3 outline-none transition focus:border-[#C61B16]"
@@ -929,6 +985,7 @@ export default function OrderPage() {
                     onChange={(e) => {
                       setReferralCode(e.target.value.toUpperCase());
                       resetReferralState();
+                      setSubmitError("");
                     }}
                     placeholder="Masukkan kode referral jika ada"
                     className="w-full rounded-2xl border border-[#E8CDBB] px-4 py-3 outline-none transition focus:border-[#C61B16]"
@@ -1073,6 +1130,7 @@ export default function OrderPage() {
                       type="button"
                       onClick={() => {
                         setBuktiBayarFile(null);
+                        setSubmitError("");
 
                         if (fileInputRef.current) {
                           fileInputRef.current.value = "";
@@ -1127,6 +1185,16 @@ export default function OrderPage() {
                 )}
               </div>
             </section>
+
+            {submitError ? (
+              <section
+                aria-live="polite"
+                className="rounded-[1.5rem] border border-red-200 bg-red-50 p-4 text-sm text-red-700"
+              >
+                <p className="font-extrabold">Order belum terkirim</p>
+                <p className="mt-1 leading-6">{submitError}</p>
+              </section>
+            ) : null}
 
             <button
               type="submit"
