@@ -765,7 +765,7 @@ export default function OrderPage() {
                   >
                     <p className="font-bold">Ambil Kampus B</p>
                     <p className="mt-1 text-xs text-[#7A5A49]">
-                      Gratis ongkir
+                      Gratis ongkir (14.00 - 14.30)
                     </p>
                   </button>
 
@@ -780,7 +780,7 @@ export default function OrderPage() {
                   >
                     <p className="font-bold">Ambil Kampus C</p>
                     <p className="mt-1 text-xs text-[#7A5A49]">
-                      Gratis ongkir
+                      Gratis ongkir (14.30 - 15.30)
                     </p>
                   </button>
 
