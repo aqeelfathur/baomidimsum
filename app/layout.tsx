@@ -13,9 +13,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Baomi Dimsum",
-  description: "More Sauce. More Bites.",
+export const metadata = {
+  title: "BAOMI Dimsum | Dimsum Mentai Torch Surabaya",
+  description:
+    "BAOMI Dimsum menyediakan dimsum mentai torch, chili oil, dan open order batch untuk area Surabaya dan sekitar Universitas Airlangga.",
+  keywords: [
+    "baomi dimsum",
+    "dimsum mentai surabaya",
+    "dimsum torch surabaya",
+    "dimsum unair",
+    "dimsum kampus b",
+    "dimsum kampus c",
+  ],
+  openGraph: {
+    title: "BAOMI Dimsum | Dimsum Mentai Torch Surabaya",
+    description:
+      "Dimsum mentai torch dengan chili oil. Open order batch untuk area Surabaya dan sekitar Universitas Airlangga.",
+    url: "https://baomidimsum.web.id",
+    siteName: "BAOMI Dimsum",
+    images: [
+      {
+        url: "https://baomidimsum.web.id/dimsum6pcs.webp",
+        width: 1200,
+        height: 630,
+        alt: "Dimsum Mentai Torch BAOMI",
+      },
+    ],
+    locale: "id_ID",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -32,3 +58,5 @@ export default function RootLayout({
     </html>
   );
 }
+
+
